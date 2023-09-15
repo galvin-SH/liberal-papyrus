@@ -1,36 +1,45 @@
-const inquirer = require('inquirer')
+const inquirer = require('inquirer');
 const fs = require('fs');
-const gm = require('./generateMarkdown');
+const generateMarkdown = require('./generateMarkdown');
 
 let questions;
 // Retireve the names of commonly used licenses, then calls the initialize function which accepts the license names
 // Finally initiates the prompt once setup is complete
 function prepareLicenseNames() {
     const licenseNames = [];
+    const licenseKeys = [];
     fetch(`https://api.github.com/licenses`)
-    .then(function(response){
-        return response.json();
-    })
-    .then(function(data){
-        data.forEach(element => {
-            licenseNames.push(element.name)
-        });;
-        initializeQuestions(licenseNames)
-        startPrompt(questions)
-    })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            data.forEach(element => {
+                licenseNames.push(element.name);
+                licenseKeys.push(element.url);
+            });
+            initializeQuestions(licenseNames);
+            startPrompt(questions, licenseNames, licenseKeys);
+        })
+}
+function makeLicenseLinks(keys) {
+    const links = [];
+    keys.forEach(element => {
+        links.push(`https://choosealicense.com/licenses/${element.slice(32)}`);
+    });
+    return links;
 }
 // Initialize the questions object for use in the inquirer prompt method
-function initializeQuestions(choices){
+function initializeQuestions(choices) {
     questions = [
         {
             name: 'title',
             type: 'input',
-            message: 'Title:'
+            message: 'Title:',
         },
         {
             name: 'desc',
             type: 'input',
-            message: 'Description:'
+            message: 'Description:',
         },
         {
             name: 'install',
@@ -45,23 +54,26 @@ function initializeQuestions(choices){
         {
             name: 'contribute',
             type: 'input',
-            message: 'Contribution Guidelines:'
+            message: 'Contribution Guidelines:',
+            default: 'This project is not currently seeking any collaborators'
         },
         {
             name: 'test',
             type: 'input',
-            message: 'Test Instructions:'
+            message: 'Test Instructions:',
+            default: 'This project does not currently implement any test functionality'
         },
         {
             name: 'license',
             type: 'list',
             message: 'Select which license to include:',
-            choices: choices
+            choices: choices,
         },
         {
             name: 'username',
             type: 'input',
-            message: 'GitHub Username:'
+            message: 'GitHub Username:',
+            default: 'galvin-sh'
         },
         {
             name: 'email',
@@ -69,22 +81,25 @@ function initializeQuestions(choices){
             message: 'Contact Email:'
         }
     ];
-}
+};
 // Starts the prompt when called and handles the answers object when complete
-function startPrompt(questions) {
+function startPrompt(questions, licenses, keys) {
     inquirer.prompt(questions)
         .then((answers) => {
-        })
-        .catch((error) => {
-            if (error.isTtyError) {
-                console.log(error);
-            } else {
-                console.error('Something went wrong', error);
-            }
+            //after recieving the answers, will run the following to begin assembling the readme
+            const links = makeLicenseLinks(keys)
+            const isLicense = (element) => element == answers.license;
+            const index = licenses.findIndex(isLicense);
+
+            writeToFile(generateMarkdown(answers, links[index]));
         })
 }
-prepareLicenseNames()
 // TODO: Create a function to write README file
 function writeToFile(data) {
-    fs.writeFile(`README.md`, data,)
-}
+    fs.writeFile(`README.md`, data, (err) => {
+        if (err) throw err;
+        console.log(`Successfully wrote README.md`)
+    }
+    );
+};
+prepareLicenseNames();
