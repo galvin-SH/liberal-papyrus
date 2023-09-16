@@ -19,6 +19,7 @@ Clone and run index.js through a JSRE (ie node.js)
 ## Usage
 Answer promopts that sequentially appear on screen until all necessary data is acquired, then the README will be generated from the responses given
 
+![demo gif](./code-demo.gif)
 ## License
 This project is licenced under [MIT License](https://choosealicense.com/licenses/mit)
 
@@ -30,7 +31,7 @@ This project does not currently implement any test functionality
 
 ## Questions
 If you have any questions or concerns regarding this project, I can be contacted via email at the following address
-placeholder.email.com
+mgalvin1993@gmail.com
 Additionally my github profile can be located by using the following link
 https://github.com/galvin-sh
 
