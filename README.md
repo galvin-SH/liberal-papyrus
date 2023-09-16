@@ -35,3 +35,5 @@ mgalvin1993@gmail.com
 Additionally my github profile can be located by using the following link
 https://github.com/galvin-sh
 
+$$ Credits
+[Starter Code Repo](https://github.com/coding-boot-camp/potential-enigma)
